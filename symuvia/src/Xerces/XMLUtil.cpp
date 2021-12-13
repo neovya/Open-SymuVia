@@ -259,7 +259,7 @@ DOMNode * XMLUtil::SelectSingleNode(const std::string &XPath, XERCES_CPP_NAMESPA
 		std::string str = US(e.getMessage());
 		str = "XPath 2.0 Error : \"" + str + "\"\nXPath : \"" + XPath + "\"\nXml node : \"" + US(XmlRoot->getTagName()) + "\"";
 #ifdef WIN32
-		::MessageBox(NULL, SystemUtil::ToWString(str).c_str(), L"SymuVia", 0);
+		::MessageBox(NULL, str.c_str(), "SymuVia", 0);
 #else
         std::cerr << str << std::endl;
 #endif
@@ -344,7 +344,7 @@ XERCES_CPP_NAMESPACE::DOMDocument * XMLUtil::LoadTrafic(const std::string & sPat
 		std::string sMsg;
 		sMsg = "The file " + sPath + " doesn't exist !";
 #ifdef WIN32
-        ::MessageBox(NULL, SystemUtil::ToWString(sMsg).c_str(), L"SymuVia Error", 0);
+        ::MessageBox(NULL, (sMsg).c_str(), "SymuVia Error", 0);
 #else
         std::cerr << sMsg << std::endl;
 #endif
@@ -363,7 +363,7 @@ XERCES_CPP_NAMESPACE::DOMDocument * XMLUtil::LoadTrafic(const std::string & sPat
         {
 		    std::string s = US(e.getMessage());
 #ifdef WIN32
-		    ::MessageBox(NULL,SystemUtil::ToWString("Validation error against the schema 'reseau.xsd' during input file loading 1: " + s).c_str(), L"SymuVia - Network loading", 0);        
+		    ::MessageBox(NULL,("Validation error against the schema 'reseau.xsd' during input file loading 1: " + s).c_str(), "SymuVia - Network loading", 0);        
 #else
             std::cerr << "Validation error against the schema 'reseau.xsd' during input file loading 1: " << s << std::endl;
 #endif
@@ -372,7 +372,7 @@ XERCES_CPP_NAMESPACE::DOMDocument * XMLUtil::LoadTrafic(const std::string & sPat
         {
 		    std::string s = US(e.getMessage());
 #ifdef WIN32
-		    ::MessageBox(NULL,SystemUtil::ToWString("Validation error against the schema 'reseau.xsd' during input file loading 2: " + s).c_str(), L"SymuVia - Network loading", 0);        
+		    ::MessageBox(NULL,("Validation error against the schema 'reseau.xsd' during input file loading 2: " + s).c_str(), "SymuVia - Network loading", 0);        
 #else
             std::cerr << "Validation error against the schema 'reseau.xsd' during input file loading 1: " << s << std::endl;
 #endif     
@@ -381,7 +381,7 @@ XERCES_CPP_NAMESPACE::DOMDocument * XMLUtil::LoadTrafic(const std::string & sPat
         {
 		    std::string s = US(e.getMessage());
 #ifdef WIN32
-		    ::MessageBox(NULL,SystemUtil::ToWString("Validation error against the schema 'reseau.xsd' during input file loading 3: " + s).c_str(), L"SymuVia - Network loading", 0);        
+		    ::MessageBox(NULL,("Validation error against the schema 'reseau.xsd' during input file loading 3: " + s).c_str(), "SymuVia - Network loading", 0);        
 #else
             std::cerr << "Validation error against the schema 'reseau.xsd' during input file loading 1: " << s << std::endl;
 #endif    
@@ -394,7 +394,7 @@ XERCES_CPP_NAMESPACE::DOMDocument * XMLUtil::LoadTrafic(const std::string & sPat
         if (pResult == NULL)
 	    {
 #ifdef WIN32
-            ::MessageBox(NULL, SystemUtil::ToWString("Validation error against the schema 'reseau.xsd' during input file loading 5: " + firstError).c_str(), L"SymuVia - Network loading", 0);
+            ::MessageBox(NULL, ("Validation error against the schema 'reseau.xsd' during input file loading 5: " + firstError).c_str(), "SymuVia - Network loading", 0);
 #else
             std::cerr << "Validation error against the schema 'reseau.xsd' during input file loading 5: " << firstError << std::endl;
 #endif      
@@ -632,7 +632,7 @@ std::vector<ScenarioElement> XMLUtil::GetScenarioElements(const std::string & xm
         if (results.empty())
         {
 #ifdef WIN32
-            ::MessageBox(NULL, SystemUtil::ToWString("Node valid SCENARIO node found in input file.").c_str(), L"SymuVia - Network loading", 0);
+            ::MessageBox(NULL, "Node valid SCENARIO node found in input file.", "SymuVia - Network loading", 0);
 #else
             std::cerr << "Node valid SCENARIO node found in input file." << std::endl;
 #endif 
@@ -641,7 +641,7 @@ std::vector<ScenarioElement> XMLUtil::GetScenarioElements(const std::string & xm
     catch (const XMLException& toCatch) {
         char* message = XMLString::transcode(toCatch.getMessage());
 #ifdef WIN32
-        ::MessageBox(NULL, SystemUtil::ToWString("Error loading input file 1: " + std::string(message)).c_str(), L"SymuVia - Network loading", 0);
+        ::MessageBox(NULL, ("Error loading input file 1: " + std::string(message)).c_str(), "SymuVia - Network loading", 0);
 #else
         std::cerr << "Error loading input file 1: " << message << std::endl;
 #endif    
@@ -650,7 +650,7 @@ std::vector<ScenarioElement> XMLUtil::GetScenarioElements(const std::string & xm
     catch (const SAXParseException& toCatch) {
         char* message = XMLString::transcode(toCatch.getMessage());
 #ifdef WIN32
-        ::MessageBox(NULL, SystemUtil::ToWString("Error loading input file 2: " + std::string(message)).c_str(), L"SymuVia - Network loading", 0);
+        ::MessageBox(NULL, ("Error loading input file 2: " + std::string(message)).c_str(), "SymuVia - Network loading", 0);
 #else
         std::cerr << "Error loading input file 2: " << message << std::endl;
 #endif 

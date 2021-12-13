@@ -31,7 +31,7 @@ HMODULE SystemUtil::m_hInstance = NULL;
 std::string SystemUtil::GetModulePath()
 {
 #ifdef WIN32
-	wchar_t lpBuff[512];
+	TCHAR lpBuff[512];
 	DWORD size;
 
 	size = ::GetModuleFileName(m_hInstance, lpBuff, sizeof(lpBuff)/sizeof(lpBuff[0]));
@@ -41,7 +41,7 @@ std::string SystemUtil::GetModulePath()
 		lpBuff[size] = 0;
 	}
 
-	return SystemUtil::ToString(std::wstring(lpBuff));
+	return std::string(lpBuff);
 #else
     std::string strPath = "";
     Dl_info info;
@@ -102,7 +102,7 @@ unsigned long SystemUtil::GetSmallFileSize(const std::string & sFilePath)
 #ifdef WIN32
 	WIN32_FIND_DATA findData;
 	
-	HANDLE handle = FindFirstFile(SystemUtil::ToWString(sFilePath).c_str(), &findData);
+	HANDLE handle = FindFirstFile(sFilePath.c_str(), &findData);
 
 	if (handle == INVALID_HANDLE_VALUE) 
 	{
@@ -175,7 +175,7 @@ std::string SystemUtil::GetFileVersion(std::string sPathA)
 		sPath = sPathA;
 	}
 
-	dwInfoSize = GetFileVersionInfoSize(SystemUtil::ToWString(sPath).c_str(), &dwArg);
+	dwInfoSize = GetFileVersionInfoSize(sPath.c_str(), &dwArg);
 
 	if(0 == dwInfoSize)
 	{
@@ -191,7 +191,7 @@ std::string SystemUtil::GetFileVersion(std::string sPathA)
 	    return "";
 	}
 
-	if(0 == GetFileVersionInfo(SystemUtil::ToWString(sPath).c_str(), 0, dwInfoSize, lpBuff))
+	if(0 == GetFileVersionInfo(sPath.c_str(), 0, dwInfoSize, lpBuff))
 	{
 	    //"Erreur lors de la récupération des informations de version"
 	    return "";

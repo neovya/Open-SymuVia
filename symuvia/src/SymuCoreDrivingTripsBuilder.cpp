@@ -191,7 +191,7 @@ bool SymuCoreDrivingTripsBuilder::FillPopulations(MultiLayersGraph * pGraph, Pop
 
                 if (pPopulationForTrip == NULL)
                 {
-                    BOOST_LOG_TRIVIAL(error) << "No population for vehicle type " << pTypeVeh->GetLabel();
+                    //BOOST_LOG_TRIVIAL(error) << "No population for vehicle type " << pTypeVeh->GetLabel();
                     return false;
                 }
 
@@ -199,7 +199,7 @@ bool SymuCoreDrivingTripsBuilder::FillPopulations(MultiLayersGraph * pGraph, Pop
                 {
                     if (!pSubPopulationForTrip && pPopulationForTrip->GetListSubPopulations().size() != 1)
                     {
-                        BOOST_LOG_TRIVIAL(error) << "Too much possibilities to select SubPopulation for Population " << pPopulationForTrip->GetStrName();
+                        //BOOST_LOG_TRIVIAL(error) << "Too much possibilities to select SubPopulation for Population " << pPopulationForTrip->GetStrName();
                         return false;
                     }
                     else
@@ -240,7 +240,7 @@ bool SymuCoreDrivingTripsBuilder::FillPopulations(MultiLayersGraph * pGraph, Pop
                 populations.getPopulationAndVehicleType(&pPopulationForTrip, &pSubPopulationForTrip, &pVehType, creation.pTypeVehicule->GetLabel());
                 if (pPopulationForTrip == NULL)
                 {
-                    BOOST_LOG_TRIVIAL(error) << "No population for vehicle type " << creation.pTypeVehicule->GetLabel();
+                    //BOOST_LOG_TRIVIAL(error) << "No population for vehicle type " << creation.pTypeVehicule->GetLabel();
                     return false;
                 }
 
@@ -248,7 +248,7 @@ bool SymuCoreDrivingTripsBuilder::FillPopulations(MultiLayersGraph * pGraph, Pop
                 {
                     if (pPopulationForTrip->GetListSubPopulations().size() != 1)
                     {
-                        BOOST_LOG_TRIVIAL(error) << "Too much possibilities to select SubPopulation for Population " << pPopulationForTrip->GetStrName();
+                        //BOOST_LOG_TRIVIAL(error) << "Too much possibilities to select SubPopulation for Population " << pPopulationForTrip->GetStrName();
                         return false;
                     }
                     else

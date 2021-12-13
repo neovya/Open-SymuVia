@@ -2177,7 +2177,7 @@ SYMUBRUIT_EXPORT double SYMUBRUIT_CDECL SymDriveVehicle
 }
 
 // For EPiCAM
-SYMUBRUIT_EXPORT int SYMUBRUIT_CDECL SymDriveVehicle
+SYMUBRUIT_EXPORT double SYMUBRUIT_CDECL SymDriveVehicle
 (
     int nID,
     std::string sTroncon,

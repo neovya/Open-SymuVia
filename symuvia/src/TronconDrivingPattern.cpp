@@ -121,7 +121,7 @@ void TronconDrivingPattern::fillMeasuredCostsForTravelTimesUpdatePeriod(int iTra
 	            // TODO - DEBUG - on laisse pour signaler d'�ventuels autres cas o� SymuVia nous donne un temps de parcours n�gatif...
                 if (dbCostValue < 0)
                 {
-                    BOOST_LOG_TRIVIAL(error) << "negative travel time : " << dbCostValue << " for link " << m_pTuyau->GetLabel();
+                    //BOOST_LOG_TRIVIAL(error) << "negative travel time : " << dbCostValue << " for link " << m_pTuyau->GetLabel();
                 }
                 cost.setUsedCostValue(dbCostValue);
 

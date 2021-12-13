@@ -5075,7 +5075,7 @@ const std::string & ssID
         if ( !SystemUtil::FolderExists(m_sOutputDir) )
         {
 #ifdef WIN32
-            ::CreateDirectory(SystemUtil::ToWString(m_sOutputDir).c_str(), NULL);
+            ::CreateDirectory(m_sOutputDir.c_str(), NULL);
 #else
             mkdir(m_sOutputDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
@@ -9868,7 +9868,7 @@ const std::string & ssID
         sMsg = "The file ";
         sMsg += sXML + " doesn't exist !";
 #ifdef WIN32
-        ::MessageBox(NULL, SystemUtil::ToWString(sMsg).c_str(), L"SymuVia Error", 0);
+        ::MessageBox(NULL, sMsg.c_str(), "SymuVia Error", 0);
 #else
         std::cerr << sMsg << std::endl;
 #endif
@@ -9887,7 +9887,7 @@ const std::string & ssID
     {
         std::string s = US(e.getMessage());
 #ifdef WIN32
-        ::MessageBox(NULL,SystemUtil::ToWString("Error validating against the schema 'update.xsd' loading input file : " + s).c_str(), L"SymuVia - Network update", 0);
+        ::MessageBox(NULL,("Error validating against the schema 'update.xsd' loading input file : " + s).c_str(), "SymuVia - Network update", 0);
 #else
         std::cerr << "Error validating against the schema 'update.xsd' loading input file : " << s << std::endl;
 #endif
@@ -9898,7 +9898,7 @@ const std::string & ssID
     {
         std::string s = US(e.getMessage());
 #ifdef WIN32
-        ::MessageBox(NULL,SystemUtil::ToWString("Error validating against the schema 'update.xsd' loading input file : " + s).c_str(), L"SymuVia - Network update", 0);
+        ::MessageBox(NULL,("Error validating against the schema 'update.xsd' loading input file : " + s).c_str(), "SymuVia - Network update", 0);
 #else
         std::cerr << "Error validating against the schema 'update.xsd' loading input file : " << s << std::endl;
 #endif
@@ -9909,7 +9909,7 @@ const std::string & ssID
     {
         std::string s = US(e.getMessage());
 #ifdef WIN32
-        ::MessageBox(NULL,SystemUtil::ToWString("Error validating against the schema 'update.xsd' loading input file : " + s).c_str(), L"SymuVia - Network update", 0);
+        ::MessageBox(NULL,("Error validating against the schema 'update.xsd' loading input file : " + s).c_str(), "SymuVia - Network update", 0);
 #else
         std::cerr << "Error validating against the schema 'update.xsd' loading input file : " << s << std::endl;
 #endif
@@ -9919,7 +9919,7 @@ const std::string & ssID
     catch (...)
     {
 #ifdef WIN32
-        ::MessageBox(NULL,L"Error validating against the schema 'update.xsd' loading input file", L"SymuVia - Network update", 0);
+        ::MessageBox(NULL,"Error validating against the schema 'update.xsd' loading input file", "SymuVia - Network update", 0);
 #else
         std::cerr << "Error validating against the schema 'update.xsd' loading input file" << std::endl;
 #endif
@@ -9930,7 +9930,7 @@ const std::string & ssID
     if (pXMLDocUpdate == NULL)
     {
 #ifdef WIN32
-        ::MessageBox(NULL,SystemUtil::ToWString("Error validating against the schema 'update.xsd' loading input file : " + firstError).c_str(), L"Network update", 0);
+        ::MessageBox(NULL,("Error validating against the schema 'update.xsd' loading input file : " + firstError).c_str(), "Network update", 0);
 #else
         std::cerr << "Error validating against the schema 'update.xsd' loading input file : " + firstError << std::endl;
 #endif
