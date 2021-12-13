@@ -356,6 +356,7 @@ Vehicule::Vehicule
 
     m_dbDstParcourue = other.m_dbDstParcourue;
     m_nGhostRemain = other.m_nGhostRemain;
+    m_nGhostRemainInit = other.m_nGhostRemainInit;
     m_pGhostFollower = other.m_pGhostFollower;
     m_pGhostLeader = other.m_pGhostLeader;
     m_pGhostVoie = other.m_pGhostVoie;
@@ -532,6 +533,7 @@ Vehicule::Vehicule
     m_dbDstParcourue = 0;
 
     m_nGhostRemain = 0;			
+    m_nGhostRemainInit = 0;
     m_pGhostVoie = NULL;
     m_pVoieOld = NULL;
 
@@ -2047,6 +2049,8 @@ void Vehicule::SortieTrafic
             m_pReseau->m_pCoordTransf->Transform(1, &dbAbs, &dbOrd);
 
         Voie* pVoie0 = m_pVoie[0];
+        Voie * pGhostTargetLane = NULL;
+        double dbGhostRatioCompleteness = -1;
 
         double dbPos0 = std::max<double>(m_pPos[0], 0); // comment on peut avoir des positions négatives ici (scenario grand lyon SG): insertion à l'aide d'un SymCreateVehicle au niveau d'une connexion interne et le véhicule ne peut pas s'insérer à cause de la présence d'autres véhicules
 
@@ -2055,6 +2059,8 @@ void Vehicule::SortieTrafic
         {
             if( m_nGhostRemain > 0 && m_pGhostVoie)
             {
+                pGhostTargetLane = pVoie0;
+                dbGhostRatioCompleteness = (m_nGhostRemainInit - m_nGhostRemain) / (double)m_nGhostRemainInit;
                 pVoie0 = m_pGhostVoie;	// Voie du ghost
                 dbPos0 = dbPos0 * m_pGhostVoie->GetLength() / m_pVoie[0]->GetLength();	// Position du ghost
             }
@@ -2164,7 +2170,7 @@ void Vehicule::SortieTrafic
             {
                 NewellContext * pNewellContext = dynamic_cast<NewellContext*>(GetCarFollowing()->GetCurrentContext());
                 pXMLDocTrafic->AddTrajectoire(m_nID, pCurrentLink, ssTuyau, ssTuyauEx, ssNextTuyauEx, nNumVoie, dbAbs, dbOrd, dbHaut, dbPos0, m_pVit[0], m_pAcc[0], pNewellContext ? pNewellContext->GetDeltaN() : -1, sTypeVehicule, dbVitMax, dbLongueur, sLib, nIDVehLeader, nCurrentLoad, m_bTypeChgtVoie && bChgtVoieDebug, m_TypeChgtVoie, m_bVoieCible && bChgtVoieDebug, m_nVoieCible,
-                    m_bPi && bChgtVoieDebug, m_dbPi, m_bPhi && bChgtVoieDebug, m_dbPhi, m_bRand && bChgtVoieDebug, m_dbRand, m_bDriven, strDriveState, m_VehiculeDepasse.get() != NULL, m_bRegimeFluideLeader, additionalAttributes);
+                    m_bPi && bChgtVoieDebug, m_dbPi, m_bPhi && bChgtVoieDebug, m_dbPhi, m_bRand && bChgtVoieDebug, m_dbRand, m_bDriven, strDriveState, m_VehiculeDepasse.get() != NULL, m_bRegimeFluideLeader, pGhostTargetLane ? pGhostTargetLane->GetNum()+1 : -1, dbGhostRatioCompleteness, additionalAttributes);
             }
         }
         else
@@ -4340,7 +4346,40 @@ void Vehicule::FinCalculTrafic
         if( m_nGhostRemain > 0)	// Un ghost existe t'il ?
         {
             m_nGhostRemain--;	// Il se rapproche de sa mort...
-            if( m_nGhostRemain == 0 || m_pTuyau[0] != m_pTuyau[1] ) // Il est mort (de sa belle mort ou par changement de tronçon), on ne le prend plus en compte
+            bool bGhostTermination = m_nGhostRemain == 0;
+            if (!bGhostTermination && m_pTuyau[0] != m_pTuyau[1])
+            {
+                bGhostTermination = true;
+                // Si le véhicule change de tronçon, on doit pouvoir poursuivre la procédure ghost si on est capable de faire
+                // le lien entre les deux voies correspondantes sur le tronçon courant et sur le nouveau tronçon. Pour celà, on
+                // fait l'hypothèse que la nouvelle voie m_pVoie[0] est l'équivalent de m_pVoie[1] dans le nouveau tronçon,
+                // et on vérifie que l'équivalent de m_pGhostVoie existe dans le nouveau tronçon (voie accessible depuis m_pGhostVoie).
+                // note : si le véhicule saute un tronçon pendant le pas de temps, on abandonne (pas grave pour  EPiCAM car très court pas de temps). 
+                if (m_pTuyau[1] && m_pTuyau[0] && m_pVoie[1] && m_pVoie[0])
+                {
+                    int nLaneOffset = m_pVoie[1]->GetNum() - m_pGhostVoie->GetNum();
+                    int iCandidateLaneNum = m_pVoie[0]->GetNum() - nLaneOffset;
+                    if (m_pTuyau[0]->GetLstLanes().size() > iCandidateLaneNum && iCandidateLaneNum >= 0)
+                    {
+                        Voie * pNewGhostVoieCandidate = m_pTuyau[0]->GetVoie(iCandidateLaneNum);
+                        // vérification de la connexion entre la précédente voie ghost et la nouvelle :
+                        // - on utilise les mouvements autorisés pour les connectionx ponctuelles (le répartiteur
+                        // étant le cas le plus courant à traiter pour EPiCAM)
+                        // - pour les CAFs, les mouvements internes étant représentés par un tronçon à une voie, on
+                        // peut les ignorer ici (si le changement de voie n'est pas terminé à l'entrée du CAF, c'est mort de toute façon)
+                        // - on traite par contre le cas des changements de voie s'il y a un giratoire au départ ou à l'arrivée ou aux deux
+                        // (pas de mouvements autorisés définis explicitement car tous le sont) 
+                        if( (m_pTuyau[0]->GetBriqueParente() && m_pTuyau[0]->GetBriqueParente()->GetType() == 'G') ||
+                            (m_pTuyau[1]->GetBriqueParente() && m_pTuyau[1]->GetBriqueParente()->GetType() == 'G') ||
+                            m_pTuyau[1]->GetCnxAssAv()->IsMouvementAutorise(m_pGhostVoie, pNewGhostVoieCandidate, GetType(), NULL))
+                        {
+                            m_pGhostVoie = pNewGhostVoieCandidate;
+                            bGhostTermination = false;
+                        }
+                    }
+                }
+            }
+            if( bGhostTermination ) // Il est mort (de sa belle mort ou par changement de tronçon), on ne le prend plus en compte
             {
                 if( m_pGhostFollower.lock() )
                 {
@@ -6017,6 +6056,7 @@ void Vehicule::serialize(Archive & ar, const unsigned int version)
     ar & BOOST_SERIALIZATION_NVP(m_pDF);
 
     ar & BOOST_SERIALIZATION_NVP(m_nGhostRemain);
+    ar & BOOST_SERIALIZATION_NVP(m_nGhostRemainInit);
     ar & BOOST_SERIALIZATION_NVP(m_dbTpsArretRestant);
     ar & BOOST_SERIALIZATION_NVP(m_nVoieInsertion);
 
